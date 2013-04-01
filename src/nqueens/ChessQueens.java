@@ -1,9 +1,22 @@
-package randomsolution;
+package nqueens;
 
-import java.util.*;
-import JaCoP.constraints.*;
-import JaCoP.search.*;
-import JaCoP.core.*;
+import java.util.Random;
+
+import tabusearch.Move;
+import tabusearch.Neighborhood;
+import tabusearch.TabuList;
+import utilities.Triple;
+import JaCoP.constraints.Alldifferent;
+import JaCoP.constraints.XplusCeqZ;
+import JaCoP.core.IntDomain;
+import JaCoP.core.IntVar;
+import JaCoP.core.Store;
+import JaCoP.core.ValueEnumeration;
+import JaCoP.search.DepthFirstSearch;
+import JaCoP.search.IndomainMedian;
+import JaCoP.search.SelectChoicePoint;
+import JaCoP.search.SimpleSelect;
+import JaCoP.search.SmallestDomain;
 
 public class ChessQueens {
 	private Store store;
@@ -100,71 +113,54 @@ public class ChessQueens {
 		System.out.print("}");
 	}
 	
-	// Main algorithm... to be completed
-	public boolean tabuSearch() {
+	/**
+	 * Solves the problem. Based on the Tabu Search
+	 * @param itMax the number of maximum iterations to do 
+	 * @param tabuSize the size of the tabulist.
+	 * @return
+	 */
+	public boolean tabuSearch(int itMax, int tabuSize) {
 		
 		// Generate a first solution
 		IntDomain[] domains = getDomains();
-		int[] sol = generateSolution(domains);
-		
-		printSolution(sol);
-		
-		// Calculate the cost of the curent solution
-		int costMin = fitness(sol);
-		int curentCost = fitness(sol);		
-		
-		System.out.println("\nfitness : " + costMin);
-		
-		//best known solution
-        int[] sol2 = sol;
+		int[] currentSolution = generateSolution(domains);
+        int[] bestSolution = currentSolution; //best known solution
         
-        // Iteration number
-        int k = 0;
+		// Calculate the cost of the current solution
+		int currentCost = fitness(currentSolution);
+        int bestCost = currentCost; 
+
+        TabuList tl = new TabuList(tabuSize);
         
-        int costs[][]  = new int[Q.length][Q.length];
+		printSolution(currentSolution);
+		System.out.println("\nfitness : " + bestCost);
         
-        while(fitness(sol2) != 0){
+        int k = 0; // Iteration number
+
+        while(k < itMax && currentCost > 0 ){
         	k++;
-        	
-        	for(int i = 0; i< sol2.length; i++){
-        		for(int j = 0; j < Q.length; j++){
-            		sol2[i] = j;
-            		curentCost = fitness(sol2);
-            		costs[i][j] = curentCost;
-        		}
-        		
-        		sol2 = sol;
-        		
-        	}
-        	
-        	int i2 = 0;
-			int j2 = 0;
-        	for(int i = 0 ; i < Q.length; i++){
-        		for(int j = 0; j < Q.length; j++){
-        			if(costs[i][j] < costMin){
-        				costMin = costs[i][j];
-        				i2 = i;
-        				j2 = j;
-        			}
-        		}
-        	}
-        	
-    		System.out.println("new cost min : " + costMin);	
-    		sol[i2] = j2;
     		
+        	Neighborhood n = new Neighborhood(currentSolution, domains); 
+        	n.determineNeighborhood();	//computes candidate solution.
+        	n.reduceNeighborhood(tl);
+        	
+        	// Retrieving the best Neighborhood
+        	Triple neighborBestSolution = n.getBestCandidateSolution();
+    		currentSolution = (int[])neighborBestSolution.getSecond();
+    		currentCost = (int)neighborBestSolution.getThird();
+        	tl.add((Move)neighborBestSolution.getFirst());
+        	
+        	if(currentCost < bestCost){
+        		bestSolution = currentSolution;
+    			bestCost = currentCost;
+        	}
+        	
 
         	
-        	
-        	
-        	
-        	
-        	
-        	
-        	
         }
+		printSolution(bestSolution);
 		
-		
-		return true;
+		return bestCost == 0;
 	}
 	
 	
@@ -194,12 +190,17 @@ public class ChessQueens {
 	}
 
 	public static void main(String[] args) {
-		final int n = 10;
+		final int n = 100;
 		ChessQueens model = new ChessQueens(n);
 
 		// boolean result = model.completeSearch();
 		
-		boolean result = model.tabuSearch();
+		boolean result = model.tabuSearch(100, 10);
+		if(result){
+			System.out.println("Solution found");
+		}else{
+			System.out.println("Solution not found");
+		}
 		
 	}
 
