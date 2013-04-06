@@ -131,7 +131,7 @@ public class ChessQueens {
         int bestCost = currentCost; 
 
         TabuList tl = new TabuList(tabuSize);
-        
+        System.out.print("Starting solution : ");
 		printSolution(currentSolution);
 		System.out.println("\nfitness : " + bestCost);
         
@@ -141,7 +141,11 @@ public class ChessQueens {
         	k++;
     		
         	Neighborhood n = new Neighborhood(currentSolution, domains); 
-        	n.determineNeighborhood();	//computes candidate solution.
+//        	try{
+        		n.determineNeighborhood();	//computes candidate solution.
+//        	}catch(Exception e){
+//        		return false;
+//        	}
         	n.reduceNeighborhood(tl);
         	
         	// Retrieving the best Neighborhood
@@ -154,11 +158,11 @@ public class ChessQueens {
         		bestSolution = currentSolution;
     			bestCost = currentCost;
         	}
-        	
-
-        	
+        	  	
         }
+        System.out.print("Final solution is ");
 		printSolution(bestSolution);
+		System.out.println("");
 		
 		return bestCost == 0;
 	}
@@ -190,17 +194,6 @@ public class ChessQueens {
 	}
 
 	public static void main(String[] args) {
-		final int n = 100;
-		ChessQueens model = new ChessQueens(n);
-
-		// boolean result = model.completeSearch();
-		
-		boolean result = model.tabuSearch(100, 10);
-		if(result){
-			System.out.println("Solution found");
-		}else{
-			System.out.println("Solution not found");
-		}
 		
 	}
 

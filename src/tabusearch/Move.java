@@ -56,7 +56,7 @@ public class Move {
 	public boolean equals(Object object) {
 		if(this.getClass() == object.getClass()){
 			Move tmp = (Move) object;
-			return(this.variable == tmp.getVariable() && this.value == this.getValue());
+			return(this.variable == tmp.getVariable() && this.value == tmp.getValue());
 		}
 	
 		return false;
