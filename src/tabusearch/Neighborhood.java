@@ -37,6 +37,8 @@ public class Neighborhood {
 	*/
 	public void determineNeighborhood(){
 			
+//		if(this.solution == null) return;
+		
 		for (int i=0; i<this.solution.length; i++){
 			ValueEnumeration values = this.domains[i].valueEnumeration();
 			

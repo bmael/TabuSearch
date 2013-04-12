@@ -1,5 +1,6 @@
 package nqueens;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import tabusearch.Move;
@@ -67,6 +68,22 @@ public class ChessQueens {
 		}
 		
 		return solution;
+	
+//		Random rand = new Random();
+//		int[] solution = new int[domains.length];
+//		
+//		for (int i=0; i<domains.length; ++i) {
+//			ValueEnumeration values = domains[i].valueEnumeration();
+//			int r = rand.nextInt(domains[i].getSize());   // 0 .. getSize()-1
+//
+//			for (int j=0; j<=r; ++j) {
+//				solution[i] = values.nextElement();  // only the r-th is relevant
+////				System.out.println("SOLLLLLLLLLIIIIIIIII : " + i + " ->>> " + solution[i]);
+//			}
+//		}
+//		
+//		return solution;
+		
 	}
 	
 	// Cost or fitness of an alldifferent constraint
@@ -131,9 +148,10 @@ public class ChessQueens {
         int bestCost = currentCost; 
 
         TabuList tl = new TabuList(tabuSize);
+        System.out.println("---------------------------------------------");
         System.out.print("Starting solution : ");
 		printSolution(currentSolution);
-		System.out.println("\nfitness : " + bestCost);
+		System.out.println("");
         
         int k = 0; // Iteration number
 
@@ -141,11 +159,11 @@ public class ChessQueens {
         	k++;
     		
         	Neighborhood n = new Neighborhood(currentSolution, domains); 
-//        	try{
+        	try{
         		n.determineNeighborhood();	//computes candidate solution.
-//        	}catch(Exception e){
-//        		return false;
-//        	}
+        	}catch(Exception e){
+        		return false;
+        	}
         	n.reduceNeighborhood(tl);
         	
         	// Retrieving the best Neighborhood
@@ -162,16 +180,18 @@ public class ChessQueens {
         }
         System.out.print("Final solution is ");
 		printSolution(bestSolution);
-		System.out.println("");
+		System.out.println("\nfitness : " + bestCost);
+		System.out.println("number of iterations : " + k);
+		System.out.println("---------------------------------------------");
 		
 		return bestCost == 0;
 	}
 	
 	
-	public boolean completeSearch() {
+	public boolean completeSearch(boolean allSolution) {
 		DepthFirstSearch<IntVar> search = new DepthFirstSearch<IntVar>();
 
-		search.getSolutionListener().searchAll(true);
+		search.getSolutionListener().searchAll(allSolution);
 		search.getSolutionListener().recordSolutions(true);
 
 		SelectChoicePoint<IntVar> select =
